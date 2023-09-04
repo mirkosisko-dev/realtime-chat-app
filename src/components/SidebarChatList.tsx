@@ -28,7 +28,6 @@ const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
         const unseenMessagesCount = unseenMessages.filter((message) => {
           return message.senderId === friend.id;
         }).length;
-        console.log({ friend });
         return (
           <li key={friend.id}>
             <a
