@@ -14,14 +14,14 @@ export default withAuth(
       pathname.startsWith(route)
     );
 
+    if (!isAuth && isAccessingSensitiveRoute)
+      return NextResponse.redirect(new URL("/login", req.url));
+
     if (isLoginPage) {
       if (isAuth) return NextResponse.redirect(new URL("/dashboard", req.url));
 
       return NextResponse.next();
     }
-
-    if (!isAuth && isAccessingSensitiveRoute)
-      return NextResponse.redirect(new URL("/login", req.url));
 
     if (pathname === "/")
       return NextResponse.redirect(new URL("/dashboard", req.url));
