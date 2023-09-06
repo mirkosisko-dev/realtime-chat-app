@@ -20,6 +20,7 @@ interface IExtendedMessage extends IMessage {
 
 const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
   const [unseenMessages, setUnseenMessages] = useState<IMessage[]>([]);
+  const [activeChats, setActiveChats] = useState<IUser[]>(friends);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -58,7 +59,8 @@ const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
       setUnseenMessages((prev) => [...prev, extendedMessage]);
     };
 
-    const newFriendHandler = () => router.refresh();
+    const newFriendHandler = (newFriend: IUser) =>
+      setActiveChats((prev) => [...prev, newFriend]);
 
     pusherClient.bind("new_message", chatHandler);
     pusherClient.bind("new_friend", newFriendHandler);
@@ -74,7 +76,7 @@ const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
 
   return (
     <ul role="list" className="max-h-[25rem] overflow-y-auto -mx-2 space-y-1">
-      {friends.sort().map((friend) => {
+      {activeChats.sort().map((friend) => {
         const unseenMessagesCount = unseenMessages.filter((message) => {
           return message.senderId === friend.id;
         }).length;

@@ -134,7 +134,7 @@ const MobileChatLayout: FC<MobileChatLayoutProps> = ({
                                     initialUnseenRequestCount={
                                       unseenRequestCount
                                     }
-                                    sessionId={session.user.id}
+                                    userId={session.user.id}
                                   />
                                 </li>
                               </ul>

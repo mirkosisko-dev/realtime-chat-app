@@ -52,7 +52,12 @@ const page: FC<IPageProps> = async ({ params }) => {
 
   const chatPartnerId = user.id === userId1 ? userId2 : userId1;
 
-  const chatPartner = (await db.get(`user:${chatPartnerId}`)) as IUser;
+  const chatPartnerRaw = (await fetchRedis(
+    "get",
+    `user:${chatPartnerId}`
+  )) as string;
+
+  const chatPartner = JSON.parse(chatPartnerRaw) as IUser;
 
   const initialMessages = await getChatMessages(chatId);
 

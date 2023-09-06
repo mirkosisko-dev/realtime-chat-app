@@ -92,7 +92,7 @@ const Layout = async ({ children }: ILayoutProps) => {
                 })}
                 <li>
                   <FriendRequestSidebarOptions
-                    sessionId={session.user.id}
+                    userId={session.user.id}
                     initialUnseenRequestCount={unseenRequestCount}
                   />
                 </li>
