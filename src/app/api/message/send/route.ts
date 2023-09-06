@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     const message = messageValidator.parse(messageData);
 
     // Notify connected users
-    pusherServer.trigger(
+    await pusherServer.trigger(
       toPusherKey(`chat:${chatId}:messages`),
       "incoming_message",
       message
