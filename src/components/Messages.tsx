@@ -2,17 +2,37 @@
 
 import { cn } from "@/lib/utils";
 import { Message } from "@/lib/validations/message";
+import { format, isToday, isYesterday } from "date-fns";
+import Image from "next/image";
 import { FC, useRef, useState } from "react";
 
 interface IMessagesProps {
   initialMessages: Message[];
   chatId: string;
   userId: string;
+  userImg: string;
+  chatPartner: IUser;
 }
 
-const Messages: FC<IMessagesProps> = ({ initialMessages, chatId, userId }) => {
+const Messages: FC<IMessagesProps> = ({
+  initialMessages,
+  chatId,
+  userId,
+  userImg,
+  chatPartner,
+}) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const scrollDownRef = useRef<HTMLDivElement | null>(null);
+
+  const formatTimestamp = (timestamp: number) => {
+    if (isToday(new Date(timestamp)))
+      return `Today at ${format(timestamp, "HH:mm")}`;
+
+    if (isYesterday(new Date(timestamp)))
+      return `Yesterday at ${format(timestamp, "HH:mm")}`;
+
+    return format(timestamp, "dd/MM/yyyy");
+  };
 
   return (
     <div
@@ -58,9 +78,29 @@ const Messages: FC<IMessagesProps> = ({ initialMessages, chatId, userId }) => {
                 >
                   {message.text}{" "}
                   <span className="ml-2 text-xs text-gray-400">
-                    {message.timestamp}
+                    {formatTimestamp(message.timestamp)}
                   </span>
                 </span>
+              </div>
+
+              <div
+                className={cn("relative w-6 h-6", {
+                  "order-2": isCurrentUser,
+                  "order-1": !isCurrentUser,
+                  invisible: hasNextMessageFromSameUser,
+                })}
+              >
+                <Image
+                  fill
+                  src={isCurrentUser ? (userImg as string) : chatPartner.image}
+                  alt={
+                    isCurrentUser
+                      ? "user profile picture"
+                      : "chat partner profile picture"
+                  }
+                  referrerPolicy="no-referrer"
+                  className="rounded-full"
+                />
               </div>
             </div>
           </div>

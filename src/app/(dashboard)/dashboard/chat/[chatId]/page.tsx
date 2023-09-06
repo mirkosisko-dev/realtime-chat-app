@@ -88,6 +88,8 @@ const page: FC<IPageProps> = async ({ params }) => {
         initialMessages={initialMessages}
         chatId={chatId}
         userId={session.user.id}
+        userImg={session.user.image}
+        chatPartner={chatPartner}
       />
       <ChatInput chatPartner={chatPartner} chatId={chatId} />
     </div>
