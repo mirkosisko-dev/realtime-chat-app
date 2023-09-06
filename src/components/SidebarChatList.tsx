@@ -1,12 +1,21 @@
 "use client";
 
-import { chatHrefConstructor } from "@/lib/utils";
+import UnseenChatToast from "./UnseenChatToast";
+
+import { pusherClient } from "@/lib/pusher";
+import { chatHrefConstructor, toPusherKey } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 interface ISidebarChatListProps {
   friends: IUser[];
   userId: string;
+}
+
+interface IExtendedMessage extends IMessage {
+  senderImg: string;
+  senderName: string;
 }
 
 const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
@@ -21,6 +30,44 @@ const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
         prev.filter((message) => !pathname.includes(message.senderId))
       );
   }, [pathname]);
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${userId}:chats`));
+    pusherClient.subscribe(toPusherKey(`user:${userId}:friends`));
+
+    const chatHandler = (extendedMessage: IExtendedMessage) => {
+      const shouldNotify =
+        pathname !==
+        `/dashboard/chat/${chatHrefConstructor(
+          userId,
+          extendedMessage.senderId
+        )}`;
+
+      if (!shouldNotify) return;
+
+      toast.custom((t) => (
+        <UnseenChatToast
+          t={t}
+          senderId={extendedMessage.senderId}
+          senderImg={extendedMessage.senderImg}
+          userId={userId}
+          senderMsg={extendedMessage.text}
+          senderName={extendedMessage.senderName}
+        />
+      ));
+      setUnseenMessages((prev) => [...prev, extendedMessage]);
+    };
+
+    const newFriendHandler = () => router.refresh();
+
+    pusherClient.bind("new_message", chatHandler);
+    pusherClient.bind("new_friend", newFriendHandler);
+
+    return () => {
+      pusherClient.unsubscribe(toPusherKey(`user:${userId}:chats`));
+      pusherClient.unsubscribe(toPusherKey(`user:${userId}:friends`));
+    };
+  }, [userId, router, pathname]);
 
   return (
     <ul role="list" className="max-h-[25rem] overflow-y-auto -mx-2 space-y-1">

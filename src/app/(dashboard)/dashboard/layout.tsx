@@ -121,7 +121,9 @@ const Layout = async ({ children }: ILayoutProps) => {
           </ul>
         </nav>
       </div>
-      {children}
+      <aside className="max-w-screen container py-16 md:py-12 w-full">
+        {children}
+      </aside>
     </div>
   );
 };
