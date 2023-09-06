@@ -66,6 +66,9 @@ const SidebarChatList: FC<ISidebarChatListProps> = ({ friends, userId }) => {
     return () => {
       pusherClient.unsubscribe(toPusherKey(`user:${userId}:chats`));
       pusherClient.unsubscribe(toPusherKey(`user:${userId}:friends`));
+
+      pusherClient.unbind("new_message", chatHandler);
+      pusherClient.unbind("new_friend", newFriendHandler);
     };
   }, [userId, router, pathname]);
 
